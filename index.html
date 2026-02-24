@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Jonah</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- TITLE BAR -->
+<div class="titlebar">
+
+    <!-- LEFT: Tabs -->
+    <div class="tab-bar">
+        <div class="tab active">
+            <img src="assets/logo.png" class="tab-logo">
+            <span>New Tab</span>
+            <span class="close-tab">✕</span>
+        </div>
+        <div class="new-tab">+</div>
+    </div>
+
+    <!-- RIGHT: Branding + Window Controls -->
+    <div class="title-right">
+        <img src="assets/ss.png" class="cogni-logo">
+
+        <div class="window-controls">
+            <button onclick="minimizeWindow()">—</button>
+            <button onclick="maximizeWindow()">☐</button>
+            <button onclick="closeWindow()" class="close-btn">✕</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- ADDRESS BAR -->
+<div class="topbar">
+
+    <div class="nav-buttons">
+        <button onclick="goBack()">←</button>
+        <button onclick="goForward()">→</button>
+        <button onclick="refreshPage()">⟳</button>
+    </div>
+
+    <input type="text" id="urlBar" placeholder="Search or enter address">
+
+    
+
+    <!-- Chat Button -->
+    <button class="chat-btn" onclick="toggleAI()">
+        Chat
+    </button>
+
+    
+
+</div>
+
+<!-- BROWSER CONTENT -->
+<div class="content">
+   <webview 
+        id="browser"
+        preload="./webview-preload.js"
+        src="home.html"
+        style="width:100%; height:100%"
+        partition="persist:main"
+        allowpopups>
+    </webview>
+
+
+</div>
+
+<!-- AI PANEL -->
+<div id="aiPanel" class="ai-hidden">
+  <iframe src="ai-panel.html"></iframe>
+</div>
+
+<script src="renderer.js"></script>
+
+<script>
+function minimizeWindow() {
+    window.api.minimize();
+}
+
+function maximizeWindow() {
+    window.api.maximize();
+}
+
+function closeWindow() {
+    window.api.close();
+}
+</script>
+</body>
+</html>
