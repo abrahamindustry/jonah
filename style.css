@@ -256,6 +256,66 @@ webview {
     align-items: center;
     -webkit-app-region: drag;
 }
+.cite-btn {
+    background: transparent;
+    border: none;
+    margin-left: 8px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 8px;
+    transition: 0.3s;
+}
+
+.cite-icon {
+    width: 28px;   /* 🔼 increased size */
+    height: 28px;
+
+    /* 🎨 Convert to futuristic blue */
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(180deg);
+
+    /* 🔥 Glow effect */
+    filter: invert(1) sepia(1) saturate(5) hue-rotate(180deg)
+            drop-shadow(0 0 6px #00eaff)
+            drop-shadow(0 0 12px #0072ff);
+
+    transition: 0.3s;
+}
+
+/* 🚀 Hover upgrade */
+.cite-btn:hover .cite-icon {
+    transform: scale(1.15);
+
+    filter: invert(1) sepia(1) saturate(6) hue-rotate(180deg)
+            drop-shadow(0 0 10px #00eaff)
+            drop-shadow(0 0 20px #0072ff);
+}
+
+/* 🔥 Hover effect */
+.cite-btn:hover {
+    background: rgba(0, 234, 255, 0.1);
+    box-shadow: 0 0 10px #00eaff;
+}
+
+.cite-btn:hover .cite-icon {
+    filter: invert(1) drop-shadow(0 0 6px #00eaff);
+    transform: scale(1.1);
+}
+.cite-btn {
+    background: transparent;
+    border: none;
+    color: blue;
+    padding: 6px 14px;
+    margin-left: 8px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.cite-btn:hover {
+    box-shadow: transparent;
+    transform: scale(1.05);
+}
 
 /* TAB BAR */
 .tab-bar {
@@ -304,4 +364,79 @@ webview {
 }
 .tab-bar {
     -webkit-app-region: no-drag;
+}
+#jonah-trust-panel {
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    width: 270px;
+
+    background: rgba(20, 20, 30, 0.75);
+    backdrop-filter: blur(18px);
+
+    border-radius: 18px;
+    padding: 14px;
+
+    color: white;
+    z-index: 999999;
+
+    box-shadow: 
+        0 0 20px rgba(0,0,0,0.6),
+        0 0 12px rgba(0, 234, 255, 0.25);
+
+    border: 1px solid rgba(255,255,255,0.08);
+
+    animation: trustFadeIn 0.25s ease;
+    transition: all 0.25s ease;
+}
+
+.trust-header {
+    font-weight: bold;
+    font-size: 14px;
+    color: #00eaff;
+    display: flex;
+    justify-content: space-between;
+}
+
+#closeTrust {
+    cursor: pointer;
+    opacity: 0.6;
+    transition: 0.2s;
+}
+#closeTrust:hover {
+    opacity: 1;
+}
+
+.trust-score {
+    font-size: 32px;
+    margin: 10px 0;
+    font-weight: bold;
+    text-shadow: 0 0 12px currentColor;
+}
+
+.trust-meta {
+    font-size: 12px;
+    opacity: 0.85;
+    margin-top: 4px;
+}
+
+.trust-issues {
+    margin-top: 10px;
+    font-size: 12px;
+}
+
+.trust-issues ul {
+    padding-left: 16px;
+    margin: 5px 0;
+}
+
+@keyframes trustFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }

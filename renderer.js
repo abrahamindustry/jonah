@@ -13,6 +13,14 @@ document.addEventListener("DOMContentLoaded", function () {
     const newTabBtn = document.querySelector(".new-tab");
     const urlBar = document.getElementById("urlBar");
 
+    webview.addEventListener("did-navigate", () => {
+        injectTrustPanel();
+    });
+
+    webview.addEventListener("did-navigate-in-page", () => {
+        injectTrustPanel();
+    });
+
     // Initial tab
     tabData.push({
         title: "New Tab",
@@ -56,10 +64,13 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-const webview = document.getElementById("browser");
-
 webview.addEventListener("dom-ready", () => {
     webview.openDevTools();
+
+    // ✅ FIRST LOAD FIX
+    setTimeout(() => {
+        injectTrustPanel();
+    }, 1000);
 });
 
 
