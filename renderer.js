@@ -7,24 +7,16 @@ let activeTabIndex = 0;
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const webview = document.getElementById("browser");
+    const webview = {}; // placeholder so your structure stays same
     const firstTab = document.querySelector(".tab");
     const tabBar = document.querySelector(".tab-bar");
     const newTabBtn = document.querySelector(".new-tab");
     const urlBar = document.getElementById("urlBar");
 
-    webview.addEventListener("did-navigate", () => {
-        injectTrustPanel();
-    });
-
-    webview.addEventListener("did-navigate-in-page", () => {
-        injectTrustPanel();
-    });
-
     // Initial tab
     tabData.push({
         title: "New Tab",
-        url: webview.src
+        url: "home.html"
     });
 
     // ENTER KEY
@@ -64,20 +56,13 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
-webview.addEventListener("dom-ready", () => {
-    webview.openDevTools();
-
-    // ✅ FIRST LOAD FIX
-    setTimeout(() => {
-        injectTrustPanel();
-    }, 1000);
-});
-
+// ===============================
+// LOAD URL
+// ===============================
 
 function loadURL() {
 
     const input = document.getElementById("urlBar").value.trim();
-    const webview = document.getElementById("browser");
 
     if (!input) return;
 
@@ -92,25 +77,27 @@ function loadURL() {
     else {
         finalURL = `file:///` + location.pathname.replace(/[^/]*$/, '') + `search.html?q=${encodeURIComponent(input)}`;
     }
-    
 
-    webview.src = finalURL;
+    window.api.loadURL(finalURL);
+
     tabData[activeTabIndex].url = finalURL;
 }
 
 
+// ===============================
+// CREATE TAB
+// ===============================
 
 function createNewTab(url) {
 
     const tabBar = document.querySelector(".tab-bar");
-    const webview = document.getElementById("browser");
 
-    // Remove active class
     document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
 
-    // Create new tab UI
     const newTab = document.createElement("div");
+
     newTab.className = "tab active";
+
     newTab.innerHTML = `
         <img src="assets/logo2.jpeg" class="tab-logo">
         <span>New Tab</span>
@@ -126,12 +113,15 @@ function createNewTab(url) {
 
     activeTabIndex = tabData.length - 1;
 
-    webview.src = url;
+    window.api.loadURL(url);
 }
 
-function switchTab(index) {
 
-    const webview = document.getElementById("browser");
+// ===============================
+// SWITCH TAB
+// ===============================
+
+function switchTab(index) {
 
     document.querySelectorAll(".tab").forEach((t, i) => {
         t.classList.toggle("active", i === index);
@@ -139,8 +129,13 @@ function switchTab(index) {
 
     activeTabIndex = index;
 
-    webview.src = tabData[index].url;
+    window.api.loadURL(tabData[index].url);
 }
+
+
+// ===============================
+// CLOSE TAB
+// ===============================
 
 function closeTab(tabElement) {
 
@@ -153,27 +148,31 @@ function closeTab(tabElement) {
     tabElement.remove();
 
     activeTabIndex = 0;
+
     switchTab(0);
 }
 
 
+// ===============================
+// NAVIGATION
+// ===============================
 
 function goBack() {
-    const webview = document.getElementById("browser");
-    if (webview.canGoBack()) webview.goBack();
+    window.api.goBack();
 }
 
 function goForward() {
-    const webview = document.getElementById("browser");
-    if (webview.canGoForward()) webview.goForward();
+    window.api.goForward();
 }
 
 function refreshPage() {
-    document.getElementById("browser").reload();
+    window.api.reload();
 }
 
 
-
+// ===============================
+// AI PANEL
+// ===============================
 
 function toggleAI() {
     document.getElementById("aiPanel").classList.toggle("ai-hidden");

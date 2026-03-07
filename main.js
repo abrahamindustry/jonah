@@ -9,7 +9,15 @@ const GOOGLE_CX = "227fd21b1ac784f3b";
 const NEWS_API_KEY = "707146fc1eed4462a9609898231f68cd";
 
 let mainWindow;
-
+app.disableHardwareAcceleration = false;
+// 🔓 Enable media access automatically
+app?.commandLine?.appendSwitch("enable-media-stream");
+app?.commandLine?.appendSwitch("enable-usermedia-screen-capturing");
+app?.commandLine?.appendSwitch("autoplay-policy", "no-user-gesture-required");
+app?.commandLine?.appendSwitch("enable-features", "WebRTCPipeWireCapturer");
+app.commandLine.appendSwitch("enable-webrtc-pipewire-capturer");
+app.commandLine.appendSwitch("disable-features", "OutOfBlinkCors");
+app.commandLine.appendSwitch("enable-features", "WebRtcHideLocalIpsWithMdns,WebRtcAllowInputVolumeAdjustment");
 
 // ✅ GOOGLE SEARCH
 ipcMain.handle('search-google', async (event, query) => {
@@ -77,14 +85,16 @@ function createWindow() {
         width: 1200,
         height: 800,
         frame: false,
-        icon: path.join(__dirname, 'assets/logo.png'),
+        icon: path.join(__dirname, 'assets/Jonah.ico'),
         webPreferences: {
             preload: path.join(__dirname, 'preload.js'),
             nodeIntegration: false,
             contextIsolation: true,
             webviewTag: true,
             sandbox: false,
-            partition: "persist:main"
+            partition: "persist:main",
+            enableBlinkFeatures: "WebRTC,MediaStream",
+            experimentalFeatures: true
         }
     });
 
@@ -100,12 +110,77 @@ function createWindow() {
     });
 
     mainWindow.loadFile('index.html');
+
+    mainWindow.webContents.setAudioMuted(false);
+
     mainWindow.webContents.openDevTools();
 }
 
 
 app.whenReady().then(async () => {
     const ses = session.fromPartition("persist:main");
+    ses.webRequest.onHeadersReceived((details, callback) => {
+
+    const headers = details.responseHeaders;
+
+    // remove headers that block embedded browsers
+    delete headers["x-frame-options"];
+    delete headers["X-Frame-Options"];
+    delete headers["content-security-policy"];
+    delete headers["Content-Security-Policy"];
+
+    callback({ responseHeaders: headers });
+
+});
+    ses.webRequest.onHeadersReceived((details, callback) => {
+
+        delete details.responseHeaders['x-frame-options'];
+        delete details.responseHeaders['X-Frame-Options'];
+
+        if (details.responseHeaders['content-security-policy']) {
+            delete details.responseHeaders['content-security-policy'];
+        }
+
+        if (details.responseHeaders['Content-Security-Policy']) {
+            delete details.responseHeaders['Content-Security-Policy'];
+        }
+
+        callback({ responseHeaders: details.responseHeaders });
+
+    });
+    ses.setDevicePermissionHandler((details) => {
+        return true;
+    });
+    
+    // 🔓 Auto allow permissions (camera, mic, etc.)
+    ses.setPermissionRequestHandler((webContents, permission, callback) => {
+
+        const allowedPermissions = [
+            "media",
+            "microphone",
+            "camera",
+            "geolocation",
+            "notifications",
+            "fullscreen",
+            "pointerLock",
+            "clipboard-read",
+            "clipboard-sanitized-write"
+        ];
+
+        if (allowedPermissions.includes(permission)) {
+            callback(true);
+        } else {
+            callback(false);
+        }
+
+    });
+
+    ses.setPermissionCheckHandler((webContents, permission) => {
+        if (permission === "media" || permission === "camera" || permission === "microphone") {
+            return true;
+        }
+        return true;
+    });
 
     await ses.clearCache();
     await ses.clearStorageData();

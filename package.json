@@ -16,8 +16,17 @@
   "build": {
     "appId": "com.jonah.browser",
     "productName": "Jonah",
+
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "assets/Jonah.ico",
+      "signAndEditExecutable": true
+    },
+
+    "mac": {
+      "target": "dmg",
+      "category": "public.app-category.utilities",
+      "icon": "assets/Jonah.icns"
     }
   },
   "dependencies": {

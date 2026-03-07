@@ -63,7 +63,9 @@
         src="home.html"
         style="width:100%; height:100%"
         partition="persist:main"
-        allowpopups>
+        allowpopups
+        src="https://web.whatsapp.com"
+        allow="camera; microphone; autoplay">
     </webview>
 
 
@@ -277,7 +279,7 @@ async function openCitationOverlay() {
 
         console.log("DOMAIN:", domain);
 
-        const response = await fetch(`http://127.0.0.1:3000/trust?domain=${domain}`)
+        const response = await fetch(`https://jonah-v5ad.onrender.com/trust?domain=${domain}`)
             .then(res => res.json())
             .catch(err => {
                 console.error("API ERROR", err);
