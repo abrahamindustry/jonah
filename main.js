@@ -11,6 +11,10 @@ const NEWS_API_KEY = "707146fc1eed4462a9609898231f68cd";
 let mainWindow;
 app.disableHardwareAcceleration = false;
 // 🔓 Enable media access automatically
+app.userAgentFallback =
+"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
+app.commandLine.appendSwitch("disable-blink-features", "AutomationControlled");
+app.commandLine.appendSwitch("disable-features", "IsolateOrigins,site-per-process");
 app?.commandLine?.appendSwitch("enable-media-stream");
 app?.commandLine?.appendSwitch("enable-usermedia-screen-capturing");
 app?.commandLine?.appendSwitch("autoplay-policy", "no-user-gesture-required");
@@ -94,9 +98,12 @@ function createWindow() {
             sandbox: false,
             partition: "persist:main",
             enableBlinkFeatures: "WebRTC,MediaStream",
-            experimentalFeatures: true
+            experimentalFeatures: true,
+            allowRunningInsecureContent: true,
+            webSecurity: true
         }
     });
+    
 
     const userAgent =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
@@ -110,6 +117,48 @@ function createWindow() {
     });
 
     mainWindow.loadFile('index.html');
+    mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+
+        if (url.includes("accounts.google.com")) {
+
+            const loginWindow = new BrowserWindow({
+                width: 500,
+                height: 700,
+                parent: mainWindow,
+                modal: false,
+                webPreferences: {
+                    nodeIntegration: false,
+                    contextIsolation: true,
+                    partition: "persist:main"
+                }
+            });
+
+            loginWindow.loadURL(url);
+
+            return { action: "deny" };
+        }
+
+        return { action: "allow" };
+    });
+    mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+
+        const popup = new BrowserWindow({
+            width: 500,
+            height: 700,
+            parent: mainWindow,
+            webPreferences: {
+                nodeIntegration: false,
+                contextIsolation: true,
+                partition: "persist:main"
+            }
+        });
+
+        popup.loadURL(url);
+
+        return { action: "deny" };
+    });
+
+
 
     mainWindow.webContents.setAudioMuted(false);
 
@@ -119,35 +168,47 @@ function createWindow() {
 
 app.whenReady().then(async () => {
     const ses = session.fromPartition("persist:main");
+    ses.webRequest.onBeforeRequest((details, callback) => {
+
+        if (
+            details.url.includes("ServiceLogin") &&
+            details.url.includes("youtube") &&
+            details.webContentsId === mainWindow.webContents.id
+        ) {
+
+            const loginWindow = new BrowserWindow({
+                width: 500,
+                height: 700,
+                parent: mainWindow,
+                modal: false,
+                webPreferences: {
+                    nodeIntegration: false,
+                    contextIsolation: true,
+                    partition: "persist:main"
+                }
+            });
+
+            loginWindow.loadURL(details.url);
+
+            return callback({ cancel: true });
+        }
+
+        callback({});
+    });
     ses.webRequest.onHeadersReceived((details, callback) => {
 
-    const headers = details.responseHeaders;
+        const headers = details.responseHeaders;
 
     // remove headers that block embedded browsers
-    delete headers["x-frame-options"];
-    delete headers["X-Frame-Options"];
-    delete headers["content-security-policy"];
-    delete headers["Content-Security-Policy"];
+        delete headers["x-frame-options"];
+        delete headers["X-Frame-Options"];
+        delete headers["content-security-policy"];
+        delete headers["Content-Security-Policy"];
 
-    callback({ responseHeaders: headers });
-
-});
-    ses.webRequest.onHeadersReceived((details, callback) => {
-
-        delete details.responseHeaders['x-frame-options'];
-        delete details.responseHeaders['X-Frame-Options'];
-
-        if (details.responseHeaders['content-security-policy']) {
-            delete details.responseHeaders['content-security-policy'];
-        }
-
-        if (details.responseHeaders['Content-Security-Policy']) {
-            delete details.responseHeaders['Content-Security-Policy'];
-        }
-
-        callback({ responseHeaders: details.responseHeaders });
+        callback({ responseHeaders: headers });
 
     });
+    
     ses.setDevicePermissionHandler((details) => {
         return true;
     });
@@ -182,8 +243,8 @@ app.whenReady().then(async () => {
         return true;
     });
 
-    await ses.clearCache();
-    await ses.clearStorageData();
+    
+    
 
     createWindow();
 });

@@ -8,6 +8,19 @@ let activeTabIndex = 0;
 document.addEventListener("DOMContentLoaded", function () {
 
     const webview = {}; // placeholder so your structure stays same
+    const browser = document.getElementById("browser"); // real webview
+    browser.addEventListener("did-stop-loading", () => {
+
+        const currentURL = browser.getURL();
+
+        // Skip local pages
+        if (currentURL.startsWith("file://")) return;
+
+        if (typeof injectTrustPanel === "function") {
+            injectTrustPanel();
+        }
+
+    });
     const firstTab = document.querySelector(".tab");
     const tabBar = document.querySelector(".tab-bar");
     const newTabBtn = document.querySelector(".new-tab");
@@ -63,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
 function loadURL() {
 
     const input = document.getElementById("urlBar").value.trim();
+    const browser = document.getElementById("browser");
 
     if (!input) return;
 
@@ -78,7 +92,11 @@ function loadURL() {
         finalURL = `file:///` + location.pathname.replace(/[^/]*$/, '') + `search.html?q=${encodeURIComponent(input)}`;
     }
 
-    window.api.loadURL(finalURL);
+    // LOAD PAGE
+    browser.loadURL(finalURL);
+
+    // Keep compatibility with your API
+    if (window.api?.loadURL) window.api.loadURL(finalURL);
 
     tabData[activeTabIndex].url = finalURL;
 }
@@ -90,12 +108,12 @@ function loadURL() {
 
 function createNewTab(url) {
 
+    const browser = document.getElementById("browser");
     const tabBar = document.querySelector(".tab-bar");
 
     document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
 
     const newTab = document.createElement("div");
-
     newTab.className = "tab active";
 
     newTab.innerHTML = `
@@ -113,7 +131,14 @@ function createNewTab(url) {
 
     activeTabIndex = tabData.length - 1;
 
-    window.api.loadURL(url);
+    if (!url.startsWith("http")) {
+        const fullPath = `file://${location.pathname.replace(/[^/]*$/, '')}${url}`;
+        browser.loadURL(fullPath);
+    } else {
+        browser.loadURL(url);
+    }
+
+    if (window.api?.loadURL) window.api.loadURL(url);
 }
 
 
@@ -123,13 +148,19 @@ function createNewTab(url) {
 
 function switchTab(index) {
 
+    const browser = document.getElementById("browser");
+
     document.querySelectorAll(".tab").forEach((t, i) => {
         t.classList.toggle("active", i === index);
     });
 
     activeTabIndex = index;
 
-    window.api.loadURL(tabData[index].url);
+    const url = tabData[index].url;
+
+    browser.loadURL(url);
+
+    if (window.api?.loadURL) window.api.loadURL(url);
 }
 
 
@@ -158,15 +189,30 @@ function closeTab(tabElement) {
 // ===============================
 
 function goBack() {
-    window.api.goBack();
+
+    const browser = document.getElementById("browser");
+
+    if (browser.canGoBack()) browser.goBack();
+
+    if (window.api?.goBack) window.api.goBack();
 }
 
 function goForward() {
-    window.api.goForward();
+
+    const browser = document.getElementById("browser");
+
+    if (browser.canGoForward()) browser.goForward();
+
+    if (window.api?.goForward) window.api.goForward();
 }
 
 function refreshPage() {
-    window.api.reload();
+
+    const browser = document.getElementById("browser");
+
+    browser.reload();
+
+    if (window.api?.reload) window.api.reload();
 }
 
 
