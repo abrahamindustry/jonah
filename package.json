@@ -22,6 +22,11 @@
       "icon": "assets/Jonah.ico",
       "signAndEditExecutable": true
     }
+    "linux": {
+    "target": ["AppImage", "deb"],
+    "category": "Utility"
+  }
+
 
     
   },
