@@ -3,7 +3,7 @@
 "version": "1.0.0",
 "main": "main.js",
 "description": "Jonah AI Browser",
-"author": "Shaun [shaun@example.com](mailto:shaun@example.com)",
+"author": "CogniAI Studios",
 "license": "ISC",
 "scripts": {
 "start": "electron .",
