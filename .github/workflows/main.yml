@@ -5,7 +5,6 @@ push:
 branches: [ main ]
 
 jobs:
-
 build-windows:
 runs-on: windows-latest
 
@@ -17,11 +16,14 @@ steps:
     with:
       node-version: 16
 
-  - run: npm install
+  - name: Install dependencies
+    run: npm install
 
-  - run: npx electron-builder --win --x64 --ia32 --publish never
+  - name: Build Windows installer
+    run: npx electron-builder --win --x64 --ia32 --publish never
 
-  - uses: actions/upload-artifact@v4
+  - name: Upload artifact
+    uses: actions/upload-artifact@v4
     with:
       name: Jonah-Windows
       path: dist/*.exe
