@@ -1,4 +1,4 @@
-name: Build Apps
+name: Build Windows App
 
 on:
 push:
@@ -8,10 +8,11 @@ jobs:
 
 build-windows:
 runs-on: windows-latest
-steps:
-- uses: actions/checkout@v3
 
 ```
+steps:
+  - uses: actions/checkout@v3
+
   - uses: actions/setup-node@v3
     with:
       node-version: 16
@@ -24,44 +25,4 @@ steps:
     with:
       name: Jonah-Windows
       path: dist/*.exe
-```
-
-build-mac:
-runs-on: macos-latest
-steps:
-- uses: actions/checkout@v3
-
-```
-  - uses: actions/setup-node@v3
-    with:
-      node-version: 16
-
-  - run: npm install
-
-  - run: npx electron-builder --mac --publish never
-
-  - uses: actions/upload-artifact@v4
-    with:
-      name: Jonah-Mac
-      path: dist/*.dmg
-```
-
-build-linux:
-runs-on: ubuntu-latest
-steps:
-- uses: actions/checkout@v3
-
-```
-  - uses: actions/setup-node@v3
-    with:
-      node-version: 16
-
-  - run: npm install
-
-  - run: npx electron-builder --linux --publish never
-
-  - uses: actions/upload-artifact@v4
-    with:
-      name: Jonah-Linux
-      path: dist/*.AppImage
 ```
