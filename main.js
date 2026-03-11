@@ -267,4 +267,5 @@ ipcMain.on('maximize-window', () => {
 
 ipcMain.on('close-window', () => {
     if (mainWindow) mainWindow.close();
+
 });
