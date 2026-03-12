@@ -235,7 +235,7 @@ app.get("/trust", async (req, res) => {
         let summary = "Mixed feedback";
 
         if (scamCount >= 3) {
-            summary = "⚠️ High scam reports detected";
+            summary = "High scam reports detected";
         } else if (complaintCount > positiveCount) {
             summary = "Frequent complaints from users";
         } else if (positiveCount > scamCount + complaintCount) {
@@ -273,4 +273,5 @@ const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
     console.log(`✅ Trust API running on port ${PORT}`);
+
 });
