@@ -6,6 +6,16 @@ app.setPath("userData", userDataPath);
 
 app.commandLine.appendSwitch("persist-session-cookies");
 app.commandLine.appendSwitch("restore-last-session");
+const widevineDir = path.join(__dirname, "widevine");
+
+app.commandLine.appendSwitch(
+  "widevine-cdm-path",
+  path.join(widevineDir, "_platform_specific/win_x64/widevinecdm.dll")
+);
+
+app.commandLine.appendSwitch("widevine-cdm-version", "4.10.2557.0");
+app.commandLine.appendSwitch("enable-features", "PlatformHEVCDecoderSupport");
+app.commandLine.appendSwitch("ignore-gpu-blocklist");
 const GOOGLE_API_KEY = "AIzaSyADND9PItYgU1JJwYclnW5E5ZWrZQiomaE";
 const GOOGLE_CX = "227fd21b1ac784f3b";
 
@@ -18,7 +28,6 @@ app.disableHardwareAcceleration = false;
 app.userAgentFallback =
 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
 app.commandLine.appendSwitch("disable-blink-features", "AutomationControlled");
-app.commandLine.appendSwitch("disable-features", "IsolateOrigins,site-per-process");
 app?.commandLine?.appendSwitch("enable-media-stream");
 app?.commandLine?.appendSwitch("enable-usermedia-screen-capturing");
 app?.commandLine?.appendSwitch("autoplay-policy", "no-user-gesture-required");
@@ -111,9 +120,13 @@ function createWindow() {
 
     const userAgent =
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-        "(KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
+        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
     const ses = session.fromPartition("persist:main");
+    ses.setUserAgent(
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
+        "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
+        );
 
     ses.webRequest.onBeforeSendHeaders((details, callback) => {
         details.requestHeaders["User-Agent"] = userAgent;
@@ -144,23 +157,7 @@ function createWindow() {
 
         return { action: "allow" };
     });
-    mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-
-        const popup = new BrowserWindow({
-            width: 500,
-            height: 700,
-            parent: mainWindow,
-            webPreferences: {
-                nodeIntegration: false,
-                contextIsolation: true,
-                partition: "persist:main"
-            }
-        });
-
-        popup.loadURL(url);
-
-        return { action: "deny" };
-    });
+    
 
 
 
