@@ -4,7 +4,7 @@
 
 let tabData = [];
 let activeTabIndex = 0;
-
+let historyList = JSON.parse(localStorage.getItem("jonah_history") || "[]");
 document.addEventListener("DOMContentLoaded", function () {
 
     const webview = {}; // placeholder so your structure stays same
@@ -12,14 +12,29 @@ document.addEventListener("DOMContentLoaded", function () {
     browser.addEventListener("did-stop-loading", () => {
 
         const currentURL = browser.getURL();
-
+        const title = browser.getTitle();
+    
         // Skip local pages
-        if (currentURL.startsWith("file://")) return;
-
+        if (!currentURL.startsWith("file://")) {
+    
+            historyList.unshift({
+                url: currentURL,
+                title: title,
+                time: Date.now()
+            });
+    
+            historyList = historyList.slice(0, 1000);
+    
+            localStorage.setItem("jonah_history", JSON.stringify(historyList));
+        }
+    
+        // Update URL bar automatically
+        document.getElementById("urlBar").value = currentURL;
+    
         if (typeof injectTrustPanel === "function") {
             injectTrustPanel();
         }
-
+    
     });
     const firstTab = document.querySelector(".tab");
     const tabBar = document.querySelector(".tab-bar");
