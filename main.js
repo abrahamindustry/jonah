@@ -1,7 +1,11 @@
 const { app, BrowserWindow, ipcMain, session } = require('electron');
 const path = require('path');
 const axios = require('axios');
+const userDataPath = path.join(app.getPath("userData"), "browser-data");
+app.setPath("userData", userDataPath);
 
+app.commandLine.appendSwitch("persist-session-cookies");
+app.commandLine.appendSwitch("restore-last-session");
 const GOOGLE_API_KEY = "AIzaSyADND9PItYgU1JJwYclnW5E5ZWrZQiomaE";
 const GOOGLE_CX = "227fd21b1ac784f3b";
 
