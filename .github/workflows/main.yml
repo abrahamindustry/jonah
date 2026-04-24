@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+    tags:
+      - "v*"
 
 jobs:
   build-windows:
@@ -16,16 +18,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: Install dependencies
         run: npm install
 
       - name: Build Windows installer
-        run: npx electron-builder --win --x64 --ia32 --publish never
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Jonah-Windows
-          path: dist/*.exe
+        run: npx electron-builder --win nsis --publish always
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
